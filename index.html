@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Resizer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 2rem;
+        }
+        .input-image, .output-image {
+            margin: 2rem 0;
+        }
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-5">Image Resizer</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <form>
+                    <div class="input-group mb-3 input-image">
+                        <input type="file" class="form-control" id="input-image" accept="image/*">
+                    </div>
+                    <div class="center">
+                        <button type="button" class="btn btn-primary" id="resize-button">Resize Image</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <div class="output-image center">
+                    <img id="resized-image" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.2/js/bootstrap.min.js"></script>
+    <script>
+        $('#resize-button').click(function() {
+            const inputImage = document.getElementById('input-image');
+            if (inputImage.files && inputImage.files[0]) {
+                const fileReader = new FileReader();
+                fileReader.onload = function(event) {
+                    const image = new Image();
+                    image.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 180;
+                        canvas.height = 80;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob(function (blob) {
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = 'resized-image.jpg';
+                            link.innerHTML = 'Download Resized Image';
+                            const outputImage = document.getElementById('resized-image');
+                            outputImage.src = url;
+                            outputImage.parentNode.appendChild(link);
+                        }, 'image/jpeg', 0.7);
+                    };
+                    image.src = event.target.result;
+                };
+                fileReader.readAsDataURL(inputImage.files[0]);
+            }
+        });
+    </script>
+</body>
+</html>
